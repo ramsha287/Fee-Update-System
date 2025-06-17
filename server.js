@@ -12,11 +12,21 @@ require('dotenv').config();
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-mongoose.connect(process.env.MONGODB_URL).then(() => console.log('MongoDB connected'))
+// MongoDB connection
+mongoose.connect(process.env.MONGODB_URL)
+  .then(() => console.log('MongoDB connected'))
   .catch(err => console.log(err));
 
+// Serve main page
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/principal', principalRoutes);
 
-app.listen(3000, () => console.log('Server running on port 3000'));
+// Use dynamic port for Railway
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
