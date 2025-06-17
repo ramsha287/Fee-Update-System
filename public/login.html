@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head><title>Login</title></head>
+<body>
+  <h1>Login</h1>
+  <form onsubmit="login(event)">
+    Username: <input name="username" /><br />
+    Password: <input name="password" type="password" /><br />
+    <button type="submit">Login</button>
+  </form>
+  <script>
+    function login(e) {
+      e.preventDefault();
+      const form = e.target;
+      fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: form.username.value,
+          password: form.password.value
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        localStorage.setItem('token', data.token);
+        window.location.href = '/';
+      })
+      .catch(() => alert('Login failed'));
+    }
+  </script>
+</body>
+</html>

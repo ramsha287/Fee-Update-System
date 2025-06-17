@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Principal Dashboard</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <h1>Student Fee Management</h1>
+    <div id="students"></div>
+
+
+    <script>
+        if (!localStorage.getItem('token')) {
+            window.location.href = '/login.html';
+        }
+        fetch('/api/principal/students', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        })  .then(res => res.json())
+            .then(students => {
+                const container = document.getElementById('students');
+                students.forEach(student => {
+                    container.innerHTML += `
+            <div>
+              <h3>${student.name} (${student.email})</h3>
+              <form onsubmit="submitForm(event, '${student._id}')">
+                Total Fee: <input type="number" name="totalFee" required /><br>
+                Due Amount: <input type="number" name="dueAmount" required /><br>
+                Due Date: <input type="text" name="dueDate" required /><br>
+                <button type="submit">Update & Send Email</button>
+              </form>
+              <hr>
+            </div>`;
+                });
+            });
+
+        function submitForm(e, id) {
+            e.preventDefault();
+            const form = e.target;
+            fetch(`/api/principal/update-fee/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    totalFee: form.totalFee.value,
+                    dueAmount: form.dueAmount.value,
+                    dueDate: form.dueDate.value
+                })
+            }).then(res => res.text()).then(alert);
+        }
+    </script>
+</body>
+
+</html>
